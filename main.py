@@ -1,7 +1,9 @@
 #-----Cronometro-----#
 #-----@Wilson11-----#
 
+
 from tkinter import *
+
 
 
 #-----Configuracion de la GUI-----#
@@ -11,6 +13,7 @@ ventana.config(bg='black')
 ventana.geometry('500x250')
 ventana.title('Cronometro')
 ventana.minsize(width=500,height=250)
+ventana.resizable(0,0)
 
 ventana.columnconfigure(0,weight=2)
 ventana.rowconfigure(0,weight=2)
@@ -62,14 +65,190 @@ texto1 = canvas1.create_text(1,1, text='0', font=('Arial',12,'bold'), fill='whit
 texto2 = canvas2.create_text(1,1, text='0', font=('Arial',12,'bold'), fill='white')
 texto3 = canvas3.create_text(1,1, text='0', font=('Arial',12,'bold'), fill='white')
 
-texto_menutos = canvas1.create_text(1,1, text='Minutos', font=('Arial',12,'bold'),fill='white', justify='center')
+texto_minutos = canvas1.create_text(1,1, text='Minutos', font=('Arial',12,'bold'),fill='white', justify='center')
 texto_segundos = canvas2.create_text(1,1, text='Segundos', font=('Arial',12,'bold'),fill='white', justify='center')
 texto_milisegundos = canvas3.create_text(1,1, text='Milisegundos', font=('Arial',12,'bold'),fill='white', justify='center')
 
-circulo1 = canvas1.create_oval(10,10,100,100, outline='#006400', width=10)
-circulo2 = canvas2.create_oval(10,10,100,100, outline='#006400', width=10)
-circulo3 = canvas3.create_oval(10,10,100,100, outline='#006400', width=10)
+circulo1 = canvas1.create_oval(10,10,100,100, outline='#006400', width=5)
+circulo2 = canvas2.create_oval(10,10,100,100, outline='#006400', width=5)
+circulo3 = canvas3.create_oval(10,10,100,100, outline='#006400', width=5)
+
+#-----Variables-----#
+
+mi = 0 #minutos
+se = 0 #segundos
+ml = 0 #milisegundos
+contar =0
+click_lectura = 0
+click_stop = 0
+click_inicio = 0
+
+#-----Codificaciones de funciones-----#
+
+def iniciar_pausar():
+
+    global mi, se, ml, contar, click_stop, click_inicio
+
+    ml +=1
+
+    if ml == 999:
+        ml = 0
+        se += 1
+        if se == 59:
+            se = 0
+            mi +=1
+    
+    contar = inicio.after(1, iniciar_pausar)
+
+    click_inicio = inicio.grid_forget()
+
+    if click_inicio is None:
+        stop.grid(column=0,row=0,padx=10,pady=10,sticky='nsew')
+        stop.config(bg='red', text='Detener')
+
+def Stop_boton():
+
+    global contar, click_stop
+
+    click_stop = stop.grid_forget()
+
+    if click_stop is None:
+        inicio.grid(column=0, row=0, padx=10, pady=10, sticky='nsew')
+        inicio.config(bg='aqua', text='Continuar')
+        inicio.after_cancel(contar)
+
+def vueltas():
+
+    global mi, se, ml, click_lectura
+
+    click_lectura+=1
+
+    if click_lectura ==1:
+        lectura1.config(text='{} → {}:{}:{} '.format(click_lectura, mi,se,ml), fg='white', bg='gray10')
+    elif click_lectura ==2:
+        lectura2.config(text='{} → {}:{}:{} '.format(click_lectura, mi,se,ml), fg='white', bg='gray10')    
+    elif click_lectura ==3:
+        lectura3.config(text='{} → {}:{}:{} '.format(click_lectura, mi,se,ml), fg='white', bg='gray10')    
+    elif click_lectura ==4:
+        lectura4.config(text='{} → {}:{}:{} '.format(click_lectura, mi,se,ml), fg='white', bg='gray10')    
+    elif click_lectura ==5:
+        lectura5.config(text='{} → {}:{}:{} '.format(click_lectura, mi,se,ml), fg='white', bg='gray10') 
+    elif click_lectura ==6:
+        lectura6.config(text='{} → {}:{}:{} '.format(click_lectura, mi,se,ml), fg='white', bg='gray10')   
+
+        click_lectura = 0      
+
+def reiniciar():
+
+    global mi, se, ml, contar, click_lectura
+     
+    mi=0
+    se=0
+    ml=0
+
+    click_lectura = 0  
+
+    inicio.after_cancel(contar)
+    lectura1.configure(text='Lectura 1', fg='white', bg='gray10')
+    lectura2.configure(text='Lectura 2', fg='white', bg='gray10')
+    lectura3.configure(text='Lectura 3', fg='white', bg='gray10')
+    lectura4.configure(text='Lectura 4', fg='white', bg='gray10')
+    lectura5.configure(text='Lectura 5', fg='white', bg='gray10')
+    lectura6.configure(text='Lectura 6', fg='white', bg='gray10')
+
+    stop.grid_forget()
+    inicio.grid(column=0,row=0,padx=10,pady=10,sticky='nsew')
+    inicio.config(bg='green2',text='Iniciar')
+
+def coordenadas():
+
+    x = canvas1.winfo_width()
+    y = canvas1.winfo_height()
+
+    x1 = int(x -0.1*x-0.1*y+25)
+    y1 = int(y -0.1*x-0.1*y+20)
+    x2 = int(x -0.4*x-0.4*y-15)
+    y2 = int(y -0.4*x-0.4*y-30)
+
+    tamanio = int(y1*0.2+x1*0.1+10)
+    tamanio_texto = int(y1*0.02+x1*0.02+3)
+
+    canvas1.coords(circulo1, x1,y1,x2,y2)
+    canvas2.coords(circulo2, x1,y1,x2,y2)
+    canvas3.coords(circulo3, x1,y1,x2,y2)
+
+    #coordenas numeros
+    z1=int(x1*0.6-10)
+    z2=int(y1*0.6-10)
+
+    #coordenadas texto
+    w1=int(x1*0.49+8)
+    w2=int(y1*0.8+10)
+
+    canvas1.coords(texto1,z1,z2)
+    canvas2.coords(texto2,z1,z2)
+    canvas3.coords(texto3,z1,z2)
+
+    canvas1.itemconfig(texto1, font=('Arial',tamanio,'bold'),text=mi)
+    canvas2.itemconfig(texto2, font=('Arial',tamanio,'bold'),text=se)
+    canvas3.itemconfig(texto3, font=('Arial',tamanio,'bold'),text=ml)
+
+    canvas1.coords(texto_minutos, w1,w2)
+    canvas2.coords(texto_segundos, w1,w2)
+    canvas3.coords(texto_milisegundos, w1,w2)
+
+    canvas1.itemconfig(texto_minutos, font=('Arial',tamanio_texto,'bold'))
+    canvas2.itemconfig(texto_segundos, font=('Arial',tamanio_texto,'bold'))
+    canvas3.itemconfig(texto_milisegundos, font=('Arial',tamanio_texto,'bold'))
+
+    canvas1.after(1, coordenadas)
 
 
+frame4.columnconfigure(0,weight=1)
+frame4.rowconfigure(0,weight=1)
+frame4.columnconfigure(1,weight=1)
+frame4.rowconfigure(0,weight=1)
+frame4.columnconfigure(2,weight=1)
+frame4.rowconfigure(0,weight=1)
+frame4.columnconfigure(3,weight=1)
+frame4.rowconfigure(0,weight=1)
+frame4.columnconfigure(4,weight=1)
+frame4.rowconfigure(0,weight=1)
+frame4.columnconfigure(5,weight=1)
+frame4.rowconfigure(0,weight=1)
+
+lectura1 = Label(frame4, text='Lectura 1:', fg='white', bg='gray10')
+lectura1.grid(column=0, row=0, sticky='nsew')
+lectura2 = Label(frame4, text='Lectura 2:', fg='white', bg='gray10')
+lectura2.grid(column=1, row=0, sticky='nsew')
+lectura3 = Label(frame4, text='Lectura 3:',fg='white', bg='gray10')
+lectura3.grid(column=2, row=0, sticky='nsew')
+lectura4 = Label(frame4, text='Lectura 4:', fg='white', bg='gray10')
+lectura4.grid(column=3, row=0, sticky='nsew')
+lectura5 = Label(frame4, text='Lectura 5:', fg='white', bg='gray10')
+lectura5.grid(column=4,row=0,sticky='nsew')
+lectura6 = Label(frame4, text='Lectura 6:', fg='white', bg='gray10')
+lectura6.grid(column=5,row=0, sticky='nsew')
+
+frame5.columnconfigure(0,weight=1)
+frame5.rowconfigure(0,weight=1)
+frame5.columnconfigure(1,weight=1)
+frame5.rowconfigure(0,weight=1)
+frame5.columnconfigure(2,weight=1)
+frame5.rowconfigure(0,weight=1)
+
+stop = Button(frame5, text='Detener', relief='raised', bd=5, bg='orange', font=('Arial',12,'bold'),width=20,command=Stop_boton)
+stop.grid(column=0,row=0,padx=10,pady=10,sticky='nsew')
+
+inicio = Button(frame5, text='Iniciar', relief='raised', bd=5, bg='orange',font=('Arial',12,'bold'), width=20,command=iniciar_pausar)
+inicio.grid(column=0, row=0, padx=10, pady=10, sticky='nsew')
+
+vuelta = Button(frame5, text='Vuelta', relief='raised', bd=5, bg='orange', font=('Arial',12,'bold'), width=20,command=vueltas)
+vuelta.grid(column=1, row=0, padx=10, pady=10, sticky='nsew')
+
+fin = Button(frame5, text='Restablecer', relief='raised', bd=5, bg='orange', font=('Arial',12,'bold'),width=20,command=reiniciar)
+fin.grid(column=2,row=0,padx=10,pady=10,sticky='nsew')
+    
+coordenadas()
 
 ventana.mainloop()
